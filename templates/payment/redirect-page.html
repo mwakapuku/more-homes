@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Receipt</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+    >
+    <style>
+        body {
+            background-color: #f9fafb;
+        }
+
+        .receipt-container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            border-bottom: 2px solid #0d6efd;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .receipt-header h2 {
+            color: #0d6efd;
+            font-weight: bold;
+        }
+
+        .receipt-details table {
+            width: 100%;
+        }
+
+        .receipt-footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+{% if success %}
+    <div class="receipt-container">
+        <div class="receipt-header">
+            <h2>Payment Receipt</h2>
+            <p>Order ID: <strong>{{ order.order_id }}</strong></p>
+            <p>Date: {{ order.created|date:"Y-m-d H:i" }}</p>
+        </div>
+
+        <div class="receipt-details">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <th scope="row">Customer</th>
+                    <td>{{ order.customer.get_full_name }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Customer Phone</th>
+                    <td>{{ order.customer.phone }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Fee</th>
+                    <td>{{ order.fee.amount }} TZS</td>
+                </tr>
+                <tr>
+                    <th scope="row">Is Paid</th>
+                    <td>
+                        {% if order.is_paid %}
+                            <span class="badge bg-success">Paid</span>
+                        {% else %}
+                            <span class="badge bg-danger">Unpaid</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Last Payment Date</th>
+                    <td>{{ order.last_payment_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Next Payment Date</th>
+                    <td>{{ order.next_payment_date }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Reference</th>
+                    <td>{{ order.reference }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Result Code</th>
+                    <td>{{ order.resultcode }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Result</th>
+                    <td>{{ order.result }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Message</th>
+                    <td>{{ order.message }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Payment Token</th>
+                    <td>{{ order.payment_token }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">QR Code</th>
+                    <td>{{ order.qr }}</td>
+                </tr>
+                <tr>
+                    <th scope="row">Payment Gateway</th>
+                    <td><a href="{{ order.payment_gateway_url }}" target="_blank">{{ order.payment_gateway_url }}</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="receipt-footer">
+            <p>Thank you for your payment!</p>
+            <p>&copy; {{ now|date:"Y" }} PropTrack. All rights reserved.</p>
+        </div>
+    </div>
+{% else %}
+    <div class="container">
+        <div class="d-flex justify-content-center">
+            <div class="alert alert-danger" role="alert">{{ msg }} please contact system Administrator</div>
+        </div>
+    </div>
+{% endif %}
+</body>
+</html>

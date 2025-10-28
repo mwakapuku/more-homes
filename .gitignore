@@ -1,0 +1,17 @@
+.venv
+venv
+nsienv
+Procfile
+staticfiles
+db.sqlite3
+media
+.idea
+.env
+nohup.out
+*.pyc
+**/__pycache__/
+
+**/migrations/*
+!**/migrations/__init__.py
+logs
+http
