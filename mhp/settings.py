@@ -77,8 +77,8 @@ CSRF_COOKIE_HTTPONLY = config('CSRF_COOKIE_HTTPONLY', cast=bool)
 CORS_ALLOW_ALL_ORIGINS = config('CORS_ALLOW_ALL_ORIGINS', cast=bool)
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://161.97.65.175',
-    'http://161.97.65.175:9098',
+    'http://213.199.45.65',
+    'http://213.199.45.65:9099',
 ]
 
 TEMPLATES = [
