@@ -70,7 +70,7 @@ class PropertySerializer(serializers.ModelSerializer):
         """Return the full URL of the uploader's profile image, or None if not available."""
         try:
             if obj.uploader.profile:
-                return f"{config("BASE_URL")}{obj.uploader.profile.url}"
+                return f"{config('BASE_URL')}{obj.uploader.profile.url}"
         except Exception:
             pass
         return None
