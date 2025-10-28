@@ -7,6 +7,8 @@ from homes.actions.property_facility_actions import update_property_facilities, 
 from homes.actions.property_image_actions import update_property_images, create_property_images
 from homes.models import PropertyImage, FacilityProperty, Property
 
+base_url = config('BASE_URL')
+
 
 class FacilitySerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +26,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
     def get_image_url(self, obj):
         try:
             if obj.image and hasattr(obj.image, "url"):
-                return f"{config("BASE_URL")}{obj.image.url}"
+                return f"{base_url}{obj.image.url}"
             return None
         except Exception:
             return None
@@ -70,7 +72,6 @@ class PropertySerializer(serializers.ModelSerializer):
         """Return the full URL of the uploader's profile image, or None if not available."""
         try:
             if obj.uploader and obj.uploader.profile:
-                base_url = config('BASE_URL')
                 return f"{base_url}{obj.uploader.profile.url}"
         except Exception:
             return None
