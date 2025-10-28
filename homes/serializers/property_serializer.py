@@ -69,10 +69,11 @@ class PropertySerializer(serializers.ModelSerializer):
     def get_uploader_image_url(self, obj):
         """Return the full URL of the uploader's profile image, or None if not available."""
         try:
-            if obj.uploader.profile:
-                return f"{config('BASE_URL')}{obj.uploader.profile.url}"
+            if obj.uploader and obj.uploader.profile:
+                base_url = config('BASE_URL')
+                return f"{base_url}{obj.uploader.profile.url}"
         except Exception:
-            pass
+            return None
         return None
 
     def get_thumbnail(self, obj):
