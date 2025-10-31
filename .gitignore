@@ -13,5 +13,7 @@ nohup.out
 
 **/migrations/*
 !**/migrations/__init__.py
+!**/migrations/0002_create_default_groups.py
+!**/migrations/0003_create_default_user.py
 logs
 http
