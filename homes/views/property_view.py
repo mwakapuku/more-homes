@@ -5,6 +5,7 @@ from rest_framework import status, permissions
 from rest_framework.views import APIView
 
 from homes.models import Property
+from homes.selectors import get_property_detail, get_property_by_uploader, get_property_to_display
 from homes.serializers import PropertySerializer
 from utils.logger import AppLogger
 from utils.response_utils import create_response
@@ -23,17 +24,12 @@ class PropertyAPIView(APIView):
     )
     def get(self, request, *args):
         logger.info(f"Received GET request on PropertyAPIView by user {request.user}")
-        properties = (
-            Property.objects.all().
-            filter(is_booked=False).
-            exclude(uploader=request.user).
-            prefetch_related('uploader')
-        )
+        properties = get_property_to_display(request.user)
+        total_item = properties.count()
         serializer = PropertySerializer(properties, many=True, context={'request': request})
 
-        logger.info(f"Returning %d properties {len(serializer.data)}")
-
-        return create_response("success", status.HTTP_200_OK, data=serializer.data)
+        logger.info(f"Returning {total_item} properties")
+        return create_response("success", status.HTTP_200_OK, total_item=total_item, data=serializer.data)
 
     # @payment_required(['broker', 'property owner', 'customer'])
     @extend_schema(
@@ -63,3 +59,45 @@ class PropertyAPIView(APIView):
         msg = f"Property creation failed: {serializer.errors}"
         logger.warning(f"Property creation failed: {serializer.errors}")
         return create_response(msg, status.HTTP_400_BAD_REQUEST)
+
+
+class PropertyDetailAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: PropertySerializer(many=True)},
+        tags=["properties"],
+        summary="Property Detail",
+        description="Returns a single property."
+    )
+    def get(self, request, uuid, *args):
+        logger.info(f"Received GET request for property with ID {uuid}")
+        try:
+            get_property = get_property_detail(uuid)
+            serializer = PropertySerializer(get_property, context={'request': request})
+            return create_response("success", status.HTTP_200_OK, data=serializer.data)
+        except Property.DoesNotExist:
+            msg = f"Property with ID {uuid} not found"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            msg = f"Property with ID validation failed: {e}"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PropertyOwnerAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: PropertySerializer(many=True)},
+        tags=["properties"],
+        summary="Uploader Property",
+        description="Returns all Uploader Properties."
+    )
+    def get(self, request, *args):
+        logger.info(f"Received GET request on PropertyDetailAPIView by user {request.user}")
+        get_properties = get_property_by_uploader(request.user)
+        total_item = get_properties.count()
+        serializers = PropertySerializer(get_properties, many=True, context={'request': request})
+        return create_response("success", status.HTTP_200_OK, total_item=total_item, data=serializers.data)

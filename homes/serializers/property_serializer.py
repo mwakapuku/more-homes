@@ -46,9 +46,9 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            "id", "name", "type", "address", "price", "thumbnail", "is_booked", "description", "total_price",
+            'uuid', "name", "type", "address", "price", "thumbnail", "is_booked", "description", "total_price",
             "latitude", "longitude", "region", "district", "maintenance", "category", "uploader", "uploader_name",
-            "uploader_phone", "uploader_role", "uploader_image_url", "facilities", "images", "created_at",
+            "uploader_phone", "uploader_role", "uploader_image_url", "created_at", "facilities", "images",
         ]
 
     def get_uploader_name(self, obj):
@@ -59,7 +59,7 @@ class PropertySerializer(serializers.ModelSerializer):
         """Return the phone number of the uploader, or None if not available."""
         return getattr(obj.uploader, "phone", None)
 
-    def get_uploader_group(self, obj):
+    def get_uploader_role(self, obj):
         """Return a comma-separated string of group names the user belongs to."""
         group_name = [group.name for group in obj.uploader.groups.all()]
         if not group_name:

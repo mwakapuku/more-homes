@@ -1,3 +1,28 @@
 from django.contrib import admin
 
+from homes.models import Property, PropertyImage, FacilityProperty
+
+
 # Register your models here.
+@admin.register(Property)
+class PropertyAdmin(admin.ModelAdmin):
+    list_display = [
+        'uploader', 'name', 'type', 'address', 'price', 'category', 'is_booked', 'region', 'district', 'longitude',
+        'latitude', 'created_at'
+    ]
+    list_filter = ['is_booked', 'category', 'created_at', 'updated_at']
+    list_max_show_all = True
+    search_fields = ['name']
+    list_per_page = 30
+
+
+@admin.register(PropertyImage)
+class PropertyImageAdmin(admin.ModelAdmin):
+    list_display = ['property', 'image', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
+
+
+@admin.register(FacilityProperty)
+class FacilityPropertyAdmin(admin.ModelAdmin):
+    list_display = ['property', 'name', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
