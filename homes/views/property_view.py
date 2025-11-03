@@ -4,13 +4,28 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status, permissions
 from rest_framework.views import APIView
 
-from homes.models import Property
+from homes.models import Property, Facility
 from homes.selectors import get_property_detail, get_property_by_uploader, get_property_to_display
-from homes.serializers import PropertySerializer
+from homes.serializers import PropertySerializer, FacilitySerializer
 from utils.logger import AppLogger
 from utils.response_utils import create_response
 
 logger = AppLogger(__name__)
+
+
+class FacilityAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: FacilitySerializer(many=True)},
+        tags=['Facility'],
+        summary='Facility API',
+        description='Return List of all Facility',
+    )
+    def get(self, request):
+        facilities = Facility.objects.all()
+        serializer = FacilitySerializer(facilities, many=True)
+        return create_response("success", status.HTTP_200_OK, total_item=len(serializer.data), data=serializer.data)
 
 
 class PropertyAPIView(APIView):
@@ -52,7 +67,8 @@ class PropertyAPIView(APIView):
 
         serializer = PropertySerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
-            property_obj = serializer.save(uploader=request.user)
+            user = request.user
+            property_obj = serializer.save(uploader=user, created_by=user, updated_by=user)
             logger.info(f"Property created with ID: {property_obj.id}")
             return create_response("success", status.HTTP_200_OK, data=request.data)
 

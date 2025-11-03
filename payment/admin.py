@@ -6,7 +6,7 @@ from payment.models import CustomerOrderPayment, CustomerOrder, OrderStaticConfi
 # Register your models here.
 @admin.register(Fee)
 class FeeAdmin(admin.ModelAdmin):
-    list_display = ('group', 'amount', 'interval', 'active', 'uuid')
+    list_display = ('group', 'amount', 'interval', 'active')
     list_filter = ('group', 'active')
     search_fields = ('group',)
     ordering = ('group',)
@@ -19,14 +19,14 @@ class OrderStaticConfigAdmin(admin.ModelAdmin):
     )
     list_filter = ('currency', 'payment_methods', 'active')
     search_fields = ('vendor_till', 'api_key', 'secrets_key')
-    readonly_fields = ('created_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at', 'uuid')
 
 
 @admin.register(CustomerOrder)
 class CustomerOrderAdmin(admin.ModelAdmin):
     list_display = (
         'customer', 'fee', 'is_paid', 'last_payment_date', 'next_payment_date',
-        'reference', 'resultcode', 'result', 'message', 'uuid'
+        'reference', 'resultcode', 'result', 'message'
     )
     list_filter = ('is_paid', 'last_payment_date', 'next_payment_date')
     search_fields = (
@@ -35,8 +35,8 @@ class CustomerOrderAdmin(admin.ModelAdmin):
     autocomplete_fields = ('customer', 'static_conf', 'fee')
     raw_id_fields = ('customer', 'static_conf', 'fee')
     readonly_fields = (
-        'created_at', 'updated_at', 'reference', 'resultcode', 'result',
-        'message', 'gateway_buyer_uuid', 'payment_token', 'qr', 'payment_gateway_url'
+        'created_at', 'updated_at', 'reference', 'resultcode', 'result','is_paid', 'is_generated',
+        'message', 'gateway_buyer_uuid', 'payment_token', 'qr', 'payment_gateway_url', 'uuid', 'order_id'
     )
 
 
@@ -48,7 +48,7 @@ class CustomerOrderPaymentAdmin(admin.ModelAdmin):
     list_filter = ('payment_status', 'result', 'channel')
     search_fields = ('order__order_id', 'transid', 'reference', 'phone')
     raw_id_fields = ('order',)
-    readonly_fields = ('uuid', 'created_at', 'updated_at')
+    readonly_fields = ('uuid', 'created_at', 'updated_at', 'amount')
 
 
 @admin.register(WebhookResponse)

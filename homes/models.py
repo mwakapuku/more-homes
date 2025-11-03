@@ -3,6 +3,19 @@ from django.db import models
 from payment.models import AuditModel
 
 
+class Facility(AuditModel):
+    name = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'facility'
+        verbose_name_plural = 'Facilities'
+        verbose_name = 'Facility'
+        ordering = ['name']
+
+
 # Create your models here.
 class Property(AuditModel):
     CATEGORY_CHOICES = (

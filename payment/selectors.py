@@ -27,3 +27,8 @@ def get_customer_order(order_id):
     except CustomerOrder.DoesNotExist:
         logger.error(f"Order not found: {order_id}")
         raise
+
+
+def get_orders_url_not_generate():
+    """Get all order where url is null and is not generated."""
+    return CustomerOrder.objects.filter(url__isnull=True, is_generated=False)

@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from homes.models import Property, PropertyImage, FacilityProperty
+from homes.models import Property, PropertyImage, FacilityProperty, Facility
 
 
-# Register your models here.
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):
     list_display = [
@@ -20,9 +19,18 @@ class PropertyAdmin(admin.ModelAdmin):
 class PropertyImageAdmin(admin.ModelAdmin):
     list_display = ['property', 'image', 'created_at', 'updated_at']
     list_filter = ['created_at', 'updated_at']
+    list_per_page = 30
+
+
+@admin.register(Facility)
+class FacilityAdmin(admin.ModelAdmin):
+    list_display = ['name', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
+    list_per_page = 30
 
 
 @admin.register(FacilityProperty)
 class FacilityPropertyAdmin(admin.ModelAdmin):
     list_display = ['property', 'name', 'created_at', 'updated_at']
     list_filter = ['created_at', 'updated_at']
+    list_per_page = 30

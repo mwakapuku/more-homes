@@ -5,12 +5,18 @@ from rest_framework import serializers
 
 from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities
 from homes.actions.property_image_actions import update_property_images, create_property_images
-from homes.models import PropertyImage, FacilityProperty, Property
+from homes.models import PropertyImage, FacilityProperty, Property, Facility
 
 base_url = config('BASE_URL')
 
 
 class FacilitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Facility
+        fields = '__all__'
+
+
+class PropertyFacilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = FacilityProperty
         fields = ["id", "name"]
@@ -34,7 +40,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 class PropertySerializer(serializers.ModelSerializer):
     uploader = serializers.ReadOnlyField(source="uploader.id")
-    facilities = FacilitySerializer(many=True, read_only=True)
+    facilities = PropertyFacilitySerializer(many=True, read_only=True)
     images = PropertyImageSerializer(many=True, read_only=True)
     thumbnail = serializers.SerializerMethodField()
 

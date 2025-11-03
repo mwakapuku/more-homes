@@ -175,7 +175,7 @@ class CustomerOrderPayment(AuditModel):
 
 
 class WebhookResponse(AuditModel):
-    response = models.TextField()
+    response = models.TextField(unique=True)
     remote_ip = models.GenericIPAddressField()
     processed = models.BooleanField(default=False)
 

@@ -45,8 +45,8 @@ class PaymentWebhookApiView(APIView):
             return create_response(msg, status.HTTP_400_BAD_REQUEST)
 
         # before processing the data first save the request body
-        webhook_res = create_webhook_response(request.META.get("REMOTE_ADDR", "0.0.0.0"),  request.data)
-        if serializer.is_valid():
+        webhook_res = create_webhook_response(request.data, request.META.get("REMOTE_ADDR", "0.0.0.0"))
+        if serializer.is_valid() and webhook_res is not None:
             try:
                 with transaction.atomic():
                     payment_data = serializer.validated_data
@@ -71,9 +71,11 @@ class PaymentWebhookApiView(APIView):
                 return create_response(msg, status.HTTP_404_NOT_FOUND)
 
             except Exception as e:
-                logger.error(f"Error processing payment: {str(e)}", exc_info=True)
+                logger.error(f"Error processing payment: {str(e)}")
                 msg = f"Error processing payment: {str(e)}"
                 return create_response(msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+        else:
+            return create_response("Payment process failed", status.HTTP_400_BAD_REQUEST)
 
 
 class CustomerOrderApiView(APIView):

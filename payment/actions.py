@@ -14,11 +14,14 @@ logger = AppLogger(__name__)
 
 
 def create_webhook_response(body, ip):
-    WebhookResponse.objects.create(
-        response=body,
-        remote_ip=ip,
-    )
-
+    try:
+        webhook_response = WebhookResponse( response=body, remote_ip=ip)
+        webhook_response.save()
+        logger.info('Created webhook response')
+        return webhook_response
+    except Exception as ex:
+        logger.info(f'Failed to create webhook response {ex}')
+        return None
 
 def create_payment_record(order, payment_data):
     logger.info(f"Starting creation payment records")
@@ -38,7 +41,17 @@ def create_payment_record(order, payment_data):
     )
 
 
-def request_payment_url(user: User) -> Response:
+def request_payment_url(payer: User) -> Response:
+    success, response = request_payer_payment_url(payer)
+    if success:
+        return create_response("Payment url processed successfully", status.HTTP_200_OK, data=response)
+    else:
+        msg = f"No unpaid orders found for {payer.first_name} {payer.last_name}"
+        logger.info(msg)
+        return create_response(msg, status.HTTP_400_BAD_REQUEST)
+
+
+def request_payer_payment_url(user: User):
     name = f"{user.first_name} {user.last_name}"
     logger.info(f"🔥 Start generating payment url request for {name}")
     get_orders = CustomerOrder.objects.filter(is_paid=False, is_generated=False, customer=user)
@@ -73,8 +86,8 @@ def request_payment_url(user: User) -> Response:
             "generated_order": success_order,
             "non_generated_order": fail_order
         }
-        return create_response("Payment url processed successfully", status.HTTP_200_OK, data=response)
+        return True, response
     else:
         msg = f"No unpaid orders found for {name}"
         logger.info(msg)
-        return create_response(msg, status.HTTP_400_BAD_REQUEST)
+        return False, None

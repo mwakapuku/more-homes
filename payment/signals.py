@@ -2,7 +2,7 @@ from django.db.models.signals import post_save, m2m_changed
 from django.dispatch import receiver
 from django.utils import timezone
 
-from payment.models import CustomerOrder
+from payment.models import CustomerOrder, CustomerOrderPayment
 from payment.selectors import get_group_fee, get_current_static_config
 from users.models import User
 from utils.logger import AppLogger
@@ -27,8 +27,21 @@ def create_user_order_on_group_add(sender, instance, action, **kwargs):
                 fee=fee,
                 customer=instance,
                 static_conf=static_conf,
-                last_payment_date = timezone.now().date(),
+                last_payment_date=timezone.now().date(),
                 created_by=instance,
                 updated_by=instance,
             )
             customer_order.save()
+
+
+@receiver(post_save, sender=CustomerOrderPayment)
+def update_customer_order_on_payment(sender, instance, created, **kwargs):
+    if created:
+        logger.info(f"Customer order payment created for {instance}")
+        if instance.order:
+            if instance.payment_status == "COMPLETED" and instance.result == "SUCCESS":
+                logger.info(f"Payment completed for order {instance.order.order_id}")
+                instance.order.is_paid = True
+                instance.order.save()
+        else:
+            logger.error(f"Payment saved successfully but order is not updated")
