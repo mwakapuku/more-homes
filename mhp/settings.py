@@ -245,5 +245,6 @@ LOGGING = {
 CRONTAB_COMMAND_SUFFIX = config('CRONTAB_COMMAND_SUFFIX', cast=str)
 
 CRONJOBS = [
-    ("* * * * *", "payment.crons.request_payment_url_cron")
+    ("* * * * *", "payment.crons.request_payment_url_cron"),
+    ("* * * * *", "payment.crons.generate_order_for_user_cron")
 ]

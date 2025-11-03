@@ -1,10 +1,11 @@
 from decimal import Decimal
 
+from django.utils import timezone
 from requests import Response
 from rest_framework import status
 
 from payment.models import CustomerOrderPayment, CustomerOrder, WebhookResponse
-from payment.selectors import get_current_static_config
+from payment.selectors import get_current_static_config, get_group_fee
 from users.models import User
 from utils.logger import AppLogger
 from utils.response_utils import create_response
@@ -15,13 +16,14 @@ logger = AppLogger(__name__)
 
 def create_webhook_response(body, ip):
     try:
-        webhook_response = WebhookResponse( response=body, remote_ip=ip)
+        webhook_response = WebhookResponse(response=body, remote_ip=ip)
         webhook_response.save()
         logger.info('Created webhook response')
         return webhook_response
     except Exception as ex:
         logger.info(f'Failed to create webhook response {ex}')
         return None
+
 
 def create_payment_record(order, payment_data):
     logger.info(f"Starting creation payment records")
@@ -91,3 +93,27 @@ def request_payer_payment_url(user: User):
         msg = f"No unpaid orders found for {name}"
         logger.info(msg)
         return False, None
+
+
+def generate_order_action(user):
+    """Get fee"""
+    fee = get_group_fee(user.groups.all().first())
+    static_conf = get_current_static_config()
+    if fee is None:
+        logger.info(f"Fee for the selected group does not found")
+    if static_conf is None:
+        logger.info(f"Static configuration not found")
+
+    if fee and static_conf:
+        logger.info(f"Customer order is created for {user}")
+        customer_order = CustomerOrder(
+            fee=fee,
+            customer=user,
+            static_conf=static_conf,
+            last_payment_date=timezone.now().date(),
+            created_by=user,
+            updated_by=user,
+        )
+        customer_order.save()
+        return customer_order
+    return None

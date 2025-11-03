@@ -114,11 +114,11 @@ class CustomerOrder(AuditModel):
     reference = models.CharField(max_length=60)
     resultcode = models.CharField(max_length=60)
     result = models.CharField(max_length=60)
-    message = models.CharField(max_length=60)
+    message = models.TextField(null=True, blank=True)
     gateway_buyer_uuid = models.CharField(max_length=60)
     payment_token = models.CharField(max_length=60)
     qr = models.CharField(max_length=60)
-    payment_gateway_url = models.CharField(max_length=60)
+    payment_gateway_url = models.CharField(max_length=60, null=True, blank=True)
 
     def __str__(self):
         return f"{self.customer}"
