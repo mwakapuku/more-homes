@@ -143,8 +143,8 @@ class RequestPaymentUrlApiView(APIView):
             404: "Customer with the given name does not have any order",
         },
         tags=["payment"],
-        summary="Get Customer Payment history and specific by specifying order_id",
-        description="This return the list of all payment history belong to authenticated customer ",
+        summary="Request payment payment urls",
+        description="This the successfully message to user ",
     )
     def get(self, request):
         return request_payment_url(request.user)
