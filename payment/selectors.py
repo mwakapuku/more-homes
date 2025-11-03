@@ -31,4 +31,4 @@ def get_customer_order(order_id):
 
 def get_orders_url_not_generate():
     """Get all order where url is null and is not generated."""
-    return CustomerOrder.objects.filter(url__isnull=True, is_generated=False)
+    return CustomerOrder.objects.filter(payment_gateway_url__isnull=True, is_generated=False)

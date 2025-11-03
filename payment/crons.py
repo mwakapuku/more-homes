@@ -6,6 +6,7 @@ logger = AppLogger(__name__)
 
 
 def request_payment_url_cron():
+    logger.info("request_payment_url_cron started")
     order = get_orders_url_not_generate()
     if order.exists():
         request_payer_payment_url(order.customer)
