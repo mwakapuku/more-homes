@@ -242,7 +242,7 @@ LOGGING = {
     },
 }
 
-CRONTAB_COMMAND_SUFFIX = '>> /home/devop/Documents/project/python/django/mhp/logs/cron.log 2>&1'
+CRONTAB_COMMAND_SUFFIX = config('CRONTAB_COMMAND_SUFFIX', cast=str)
 
 CRONJOBS = [
     ("* * * * *", "payment.crons.request_payment_url_cron")
