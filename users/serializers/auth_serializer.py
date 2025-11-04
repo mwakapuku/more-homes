@@ -84,7 +84,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             return None
 
     def get_groups(self, obj):
-        """Return a list of group names the user belongs to."""
+        """Return a list of group names the user belongs to. g"""
         return [group.name for group in obj.groups.all()]
 
     def get_permissions(self, obj):
