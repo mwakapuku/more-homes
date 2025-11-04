@@ -98,7 +98,7 @@ def request_payer_payment_url(user: User):
 def generate_order_action(user):
     """Get fee"""
     fee = get_group_fee(user.groups.first())
-    logger.info(f"User Group fee: {user.groups.first()}")
+    logger.info(f"{user.username} Group: {user.groups.first()}")
 
     static_conf = get_current_static_config()
     if fee is None:
