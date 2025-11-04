@@ -50,8 +50,6 @@ class User(AbstractUser):
     phone = models.CharField(validators=[phone_regex], max_length=20, blank=True)
     profile = models.ImageField(upload_to="profile_picture", blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
-    gender = models.CharField(max_length=10, choices=gender_choices, blank=True, null=True)
-    date_of_birth = models.DateField(blank=True, null=True)
     otp = models.CharField(max_length=6, null=True, blank=True)
     reset_otp = models.BooleanField(default=False)
     otp_expiry = models.DateTimeField(blank=True, null=True)

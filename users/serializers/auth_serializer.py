@@ -32,10 +32,10 @@ class UserProfileSerializer(serializers.ModelSerializer):
     groups = serializers.SerializerMethodField()
     class Meta:
         model = User
-        fields = (
-            'uuid', 'first_name', 'last_name', 'phone', 'email', 'username', 'location', 'gender',
-            'date_of_birth', 'password', 'profile_picture_url', 'service_charge', 'permissions', 'groups',
-        )
+        fields = [
+            'uuid', 'first_name', 'last_name', 'phone', 'email', 'username', 'location', 'password',
+            'profile_picture_url', 'service_charge', 'permissions', 'groups',
+        ]
 
         extra_kwargs = {
             'password': {'write_only': True, 'required': False},
