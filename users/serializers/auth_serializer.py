@@ -7,6 +7,7 @@ from utils.logger import AppLogger
 
 logger = AppLogger(__name__)
 
+
 class OTPVerificationSerializer(serializers.Serializer):
     phone = serializers.CharField(required=True)
     otp = serializers.CharField(required=True, max_length=6)
@@ -14,6 +15,12 @@ class OTPVerificationSerializer(serializers.Serializer):
 
 class RequestNewOTPSerializer(serializers.Serializer):
     phone = serializers.CharField(required=True)
+
+
+class UserGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name')
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -38,6 +45,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
+
     class Meta:
         model = User
         fields = [
@@ -92,6 +100,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         all_perms = obj.get_all_permissions()
         cleaned_perms = [perm.split('.', 1)[-1] for perm in all_perms]
         return cleaned_perms
+
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
