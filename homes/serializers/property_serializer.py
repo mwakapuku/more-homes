@@ -30,18 +30,17 @@ class PropertyImageSerializer(serializers.ModelSerializer):
         fields = ["id", "image", "image_url"]
 
     def get_image_url(self, obj):
-        try:
-            if obj.image and hasattr(obj.image, "url"):
-                return f"{base_url}{obj.image.url}"
-            return None
-        except Exception:
-            return None
+        request = self.context.get("request")
+        if obj.image and hasattr(obj.image, "url"):
+            # Use request.build_absolute_uri() for a full URL
+            return request.build_absolute_uri(obj.image.url) if request else f"{base_url}{obj.image.url}"
+        return None
 
 
 class PropertySerializer(serializers.ModelSerializer):
     uploader = serializers.ReadOnlyField(source="uploader.id")
     facilities = PropertyFacilitySerializer(many=True, read_only=True)
-    images = PropertyImageSerializer(many=True, read_only=True)
+    property_images = PropertyImageSerializer(many=True, read_only=True)
     thumbnail = serializers.SerializerMethodField()
 
     uploader_name = serializers.SerializerMethodField()
@@ -54,7 +53,7 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = [
             'uuid', "name", "type", "address", "price", "thumbnail", "is_booked", "description", "total_price",
             "latitude", "longitude", "region", "district", "maintenance", "category", "uploader", "uploader_name",
-            "uploader_phone", "uploader_role", "uploader_image_url", "created_at", "facilities", "images",
+            "uploader_phone", "uploader_role", "uploader_image_url", "created_at", "property_images", "facilities",
         ]
 
     def get_uploader_name(self, obj):

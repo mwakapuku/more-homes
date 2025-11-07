@@ -6,7 +6,7 @@ def get_property_to_display(uploader):
         Property.objects.all().
         filter(is_booked=False).
         exclude(uploader=uploader).
-        prefetch_related('uploader')
+        prefetch_related('uploader', 'property_images', 'facilities')
     )
 
 
