@@ -1,7 +1,14 @@
+import base64
+
 import nextsms
+import uuid
+
+from django.core.files.base import ContentFile
 
 from payment.models import CustomerOrder, OrderStaticConfig
+from utils.logger import AppLogger
 
+logger = AppLogger(__name__)
 
 def send_sms_to_user(phone: str, msg: str) -> dict:
     """Send SMS to user using NextSMS gateway.
@@ -49,3 +56,31 @@ def has_active_static_config() -> bool:
         bool: True if at least one active config exists, False otherwise
     """
     return OrderStaticConfig.objects.filter(active=True).exists()
+
+
+def create_file_from_base64(base64_str, ext="jpg"):
+    """
+    Converts a plain Base64 string (no header) into a Django ContentFile.
+
+    Args:
+        base64_str (str): Pure Base64 string (no 'data:...' header).
+        ext (str): File extension (default 'mp4').
+
+    Returns:
+        ContentFile: ready to assign to a FileField
+    """
+    if not base64_str:
+        logger.warning("No Base64 content received.")
+        return None
+
+    try:
+        # Create a random filename (e.g. video_<uuid>.mp4)
+        filename = f"propert_image_{uuid.uuid4().hex[:8]}.{ext}"
+
+        # Decode the Base64 data and wrap in ContentFile
+        file_content = base64.b64decode(base64_str)
+        return ContentFile(file_content, name=filename)
+
+    except Exception as e:
+        logger.error(f"Failed to decode Base64 file: {e}")
+        return None

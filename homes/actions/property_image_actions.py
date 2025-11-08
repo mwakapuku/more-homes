@@ -3,7 +3,10 @@ import base64
 from django.core.files.base import ContentFile
 
 from homes.models import PropertyImage
+from utils.function import create_file_from_base64
+from utils.logger import AppLogger
 
+logger = AppLogger(__name__)
 
 def update_property_images(images_data, property_instance):
     """
@@ -37,12 +40,8 @@ def create_property_images(property_instance, images_data):
         None
     """
     for img in images_data:
-        filename = img.get("filename", "image.jpg")
-        data = img.get("data")
+        data = img.get("image")
         if data:
-            try:
-                image_file = ContentFile(base64.b64decode(data), name=filename)
-                PropertyImage.objects.create(property=property_instance, image=image_file)
-            except Exception as e:
-                # Optionally log the error instead of failing completely
-                print(f"Failed to create image {filename}: {e}")
+            image_file = create_file_from_base64(data)
+            PropertyImage.objects.create(property=property_instance, image=image_file)
+            logger.info(f"Successfully create image {image_file}")
