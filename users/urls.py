@@ -12,6 +12,6 @@ urlpatterns = [
     path('user-change-password', ChangeUserPasswordApiView.as_view(), name='change_password'),
     path('otp/verify/', OTPVerificationView.as_view(), name='otp_verify'),
     path('otp/request/', RequestNewOTPView.as_view(), name='otp_request'),
-    path('roles', GroupApiView.as_view(), name='groups'),
+    path('roles/', GroupApiView.as_view(), name='groups'),
 ]
 

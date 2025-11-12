@@ -8,8 +8,6 @@ from drf_yasg.views import get_schema_view
 from rest_framework import permissions
 
 from mhp import settings
-from users.views import CustomLoginView, OTPVerificationView, RequestNewOTPView, ResetPasswordApiView, \
-    RequestResetOtpApiView, ChangeUserPasswordApiView, RegisterUserAPIView
 
 schema_view = get_schema_view(
     openapi.Info(

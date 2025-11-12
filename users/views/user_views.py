@@ -20,7 +20,7 @@ from ..actions import change_user_password
 from ..selectors import verify_phone, get_user_phone, check_user_by_phone, check_password_match, check_current_password
 from ..serializers import UserProfileSerializer, RequestNewOTPSerializer, OTPVerificationSerializer, \
     ResetPasswordSerializer, ChangePasswordSerializer, LoginSerializer, UserGroupSerializer
-
+from django.contrib.auth.models import Group
 logger = AppLogger(__name__)
 
 
@@ -383,7 +383,7 @@ class ChangeUserPasswordApiView(APIView):
 
 class GroupApiView(APIView):
     def get(self, request, *args, **kwargs):
-        groups = Group.objects.exclude(name__icontain="admin")
+        groups = Group.objects.exclude(name__icontains="admin")
         serializer = UserGroupSerializer(groups, many=True)
         total_items = len(serializer.data)
         return create_response("success", status.HTTP_200_OK, data=serializer.data, total_item=total_items)
