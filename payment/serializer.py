@@ -61,7 +61,7 @@ class CustomerOrderSerializer(serializers.ModelSerializer):
             'order_id',
             'last_payment_date',
             'next_payment_date',
-            'created',
+            'created_at',
             'amount',
             'interval',
             'is_paid',
