@@ -124,7 +124,7 @@ class CustomerPaymentLogsAPIView(APIView):
         order_id = request.query_params.get('order_id')
         user = request.user
 
-        payments = CustomerOrderPayment.objects.filter(order__customer=user).order_by('-created')
+        payments = CustomerOrderPayment.objects.filter(order__customer=user).order_by('-created_at')
 
         if order_id:
             payments.filter(order__order_id=order_id)
