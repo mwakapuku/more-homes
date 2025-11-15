@@ -103,10 +103,14 @@ class PropertySerializer(serializers.ModelSerializer):
         raw_facilities = request.data.get("facilities", "[]")
         try:
             facilities_data = json.loads(raw_facilities)
-        except Exception:
-            pass
+            print("Facilities on try")
+            print(facilities_data)
+        except Exception as e:
+            print(f"EError on getting facility Facilities {e}")
 
         # --- Create facilities ---
+        print("Facilities form request")
+        print(facilities_data)
         create_property_facilities(facilities_data, property_instance)
 
         # --- Parse Base64 Images ---

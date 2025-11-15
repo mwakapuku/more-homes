@@ -10,9 +10,13 @@ def create_property_facilities(facilities, property_instance):
          facilities: A list of dictionaries containing 'filename'.
      """
     if facilities:
+        print("Facilities on saving")
+        print(facilities)
         for facility in facilities:
             name = facility.get("name")
             FacilityProperty.objects.create(property=property_instance, name=name)
+    else:
+        print("No facilities on try")
 
 
 def update_property_facilities(facilities, property_instance):
