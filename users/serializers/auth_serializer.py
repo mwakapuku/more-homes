@@ -50,7 +50,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         model = User
         fields = [
             'uuid', 'first_name', 'last_name', 'phone', 'email', 'username', 'location', 'password',
-            'profile_picture_url', 'service_charge', 'permissions', 'groups',
+            'profile_picture_url', 'permissions', 'groups',
         ]
 
         extra_kwargs = {
