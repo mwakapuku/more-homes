@@ -7,11 +7,12 @@ def create_property_facilities(facilities, property_instance):
 
      Args:
          property_instance: The Property instance whose images are being updated.
-         facilities: A list of dictionaries containing 'filename' and Base64-encoded 'data'.
+         facilities: A list of dictionaries containing 'filename'.
      """
     if facilities:
         for facility in facilities:
-            FacilityProperty.objects.create(property=property_instance, **facility)
+            name = facility.get("name")
+            FacilityProperty.objects.create(property=property_instance, name=name)
 
 
 def update_property_facilities(facilities, property_instance):
@@ -25,4 +26,5 @@ def update_property_facilities(facilities, property_instance):
     if facilities:
         property_instance.facilities.all().delete()
         for facility in facilities:
-            FacilityProperty.objects.create(property=property_instance, **facility)
+            name = facility.get("name")
+            FacilityProperty.objects.create(property=property_instance, name=name)

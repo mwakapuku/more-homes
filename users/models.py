@@ -46,7 +46,6 @@ class User(AbstractUser):
     )
     first_name = models.CharField(max_length=100, null=True, blank=False)
     last_name = models.CharField(max_length=100, null=True, blank=False)
-    service_charge = models.DecimalField(decimal_places=2, max_digits=10, null=True, blank=True)
     phone = models.CharField(validators=[phone_regex], max_length=20, blank=True)
     profile = models.ImageField(upload_to="profile_picture", blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
