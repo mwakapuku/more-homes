@@ -100,17 +100,23 @@ class PropertySerializer(serializers.ModelSerializer):
 
         # --- Parse facilities ---
         facilities_data = []
-        raw_facilities = request.data.get("facilities", "[]")
+        raw_facilities = request.data.get("facilities", [])
         try:
-            facilities_data = json.loads(raw_facilities)
-            print("Facilities on try")
-            print(facilities_data)
-        except Exception as e:
-            print(f"EError on getting facility Facilities {e}")
+            if isinstance(raw_facilities, str):
+                # If frontend sent a JSON string
+                facilities_data = json.loads(raw_facilities)
+            elif isinstance(raw_facilities, list):
+                # If frontend sent an array directly (correct case)
+                facilities_data = raw_facilities
+            else:
+                print("Facilities received in unsupported format")
 
-        # --- Create facilities ---
-        print("Facilities form request")
-        print(facilities_data)
+            print("Facilities parsed successfully")
+            print(facilities_data)
+
+        except Exception as e:
+            print(f"Error parsing facilities: {e}")
+
         create_property_facilities(facilities_data, property_instance)
 
         # --- Parse Base64 Images ---
