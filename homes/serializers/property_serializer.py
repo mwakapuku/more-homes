@@ -5,7 +5,7 @@ from rest_framework import serializers
 
 from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities
 from homes.actions.property_image_actions import update_property_images, create_property_images
-from homes.models import PropertyImage, FacilityProperty, Property, Facility
+from homes.models import PropertyImage, FacilityProperty, Property, Facility, PropertyFeedBack
 
 base_url = config('BASE_URL')
 
@@ -154,3 +154,18 @@ class PropertySerializer(serializers.ModelSerializer):
         update_property_images(images_data, instance)
 
         return instance
+
+
+class PropertyFeedBackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyFeedBack
+        fields = ['uuid', 'message', 'property']
+
+    def create(self, validated_data):
+        request = self.context["request"]
+        property_instance = PropertyFeedBack.objects.create(**validated_data)
+        property_instance.created_by = request.user
+        property_instance.updated_by = request.user
+        property_instance.save()
+
+        return property_instance

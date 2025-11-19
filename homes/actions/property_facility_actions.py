@@ -14,7 +14,12 @@ def create_property_facilities(facilities, property_instance):
         print(facilities)
         for facility in facilities:
             name = facility.get("name")
-            FacilityProperty.objects.create(property=property_instance, name=name)
+            FacilityProperty.objects.create(
+                property=property_instance,
+                name=name,
+                created_by=property_instance.created_by,
+                updated_by=property_instance.created_by,
+            )
     else:
         print("No facilities on try")
 
@@ -31,4 +36,9 @@ def update_property_facilities(facilities, property_instance):
         property_instance.facilities.all().delete()
         for facility in facilities:
             name = facility.get("name")
-            FacilityProperty.objects.create(property=property_instance, name=name)
+            FacilityProperty.objects.create(
+                property=property_instance,
+                name=name,
+                created_by=property_instance.created_by,
+                updated_by=property_instance.created_by,
+            )

@@ -83,3 +83,11 @@ class FacilityProperty(AuditModel):
         verbose_name_plural = "Property Facilities"
         verbose_name = "Property Facilities"
         ordering = ['-created_at']
+
+
+class PropertyFeedBack(AuditModel):
+    property = models.OneToOneField(Property, on_delete=models.CASCADE, related_name="property_feedback")
+    message = models.TextField()
+
+    def __str__(self):
+        return f"{self.property.name}"

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from homes.models import Property, PropertyImage, FacilityProperty, Facility
+from homes.models import Property, PropertyImage, FacilityProperty, Facility, PropertyFeedBack
 
 
 @admin.register(Property)
@@ -25,6 +25,13 @@ class PropertyImageAdmin(admin.ModelAdmin):
 @admin.register(Facility)
 class FacilityAdmin(admin.ModelAdmin):
     list_display = ['name', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
+    list_per_page = 30
+
+
+@admin.register(PropertyFeedBack)
+class PropertyFeedBackAdmin(admin.ModelAdmin):
+    list_display = ['property', 'message', 'created_at', 'updated_at']
     list_filter = ['created_at', 'updated_at']
     list_per_page = 30
 

@@ -4,9 +4,9 @@ from drf_spectacular.utils import extend_schema
 from rest_framework import status, permissions
 from rest_framework.views import APIView
 
-from homes.models import Property, Facility
+from homes.models import Property, Facility, PropertyFeedBack
 from homes.selectors import get_property_detail, get_property_by_uploader, get_property_to_display
-from homes.serializers import PropertySerializer, FacilitySerializer
+from homes.serializers import PropertySerializer, FacilitySerializer, PropertyFeedBackSerializer
 from utils.logger import AppLogger
 from utils.response_utils import create_response
 
@@ -117,3 +117,62 @@ class PropertyOwnerAPIView(APIView):
         total_item = get_properties.count()
         serializers = PropertySerializer(get_properties, many=True, context={'request': request})
         return create_response("success", status.HTTP_200_OK, total_item=total_item, data=serializers.data)
+
+
+class PropertyUpdateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: PropertySerializer(many=True)},
+        tags=["properties"],
+        summary="Updater Property",
+        description="Returns all Updater Properties."
+    )
+    def put(self, request, uuid, *args):
+        logger.info(f"Received PUT request on PropertyDetailAPIView by user {request.user}")
+        try:
+            get_property = get_property_detail(uuid)
+            serializer = PropertySerializer(get_property, data=request.data, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return create_response("success", status.HTTP_200_OK, data=serializer.data)
+            msg = f"Property with ID {uuid} not found"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            msg = f"Property with ID validation failed: {e}"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PropertyFeedbackAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: PropertyFeedBackSerializer(many=True)},
+        tags=["Property feedback"],
+        summary="List Property Feedback",
+        description="Returns all Property Feedback."
+    )
+    def get(self, request, *args):
+        logger.info(f"Received GET request on PropertyFeedbackAPIView by user {request.user}")
+        property_uuid = request.query_params.get('property_uuid')
+        get_feedback = PropertyFeedBack.objects.filter(property__uuid=property_uuid)
+        serializers = PropertyFeedBackSerializer(get_feedback, many=True, context={'request': request})
+        return create_response("success", status.HTTP_200_OK, data=serializers.data, total_item=get_feedback.count())
+
+    @extend_schema(
+        responses={200: PropertyFeedBackSerializer(many=True)},
+        tags=["Property feedback"],
+        summary="Save Property Feedback",
+        description="Save Property Feedback."
+    )
+    def post(self, request, *args):
+        logger.info(f"Received POST request on PropertyFeedbackAPIView by user {request.user}")
+        serializers = PropertyFeedBackSerializer(data=request.data, context={'request': request})
+        if serializers.is_valid():
+            serializers.save()
+            return create_response("success", status.HTTP_200_OK, data=serializers.data)
+        msg = f"Property creation failed: {serializers.errors}"
+        logger.error(msg)
+        return create_response(msg, status.HTTP_400_BAD_REQUEST)
