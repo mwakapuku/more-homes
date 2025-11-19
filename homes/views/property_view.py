@@ -183,7 +183,7 @@ class PropertyOwnerFeedbackAPIView(APIView):
 
     @extend_schema(
         responses={200: PropertyFeedBackSerializer(many=True)},
-        tags=["Property owner feedback"],
+        tags=["Property feedback"],
         summary="List Property owner Feedback",
         description="Returns all Property owner Feedbacks."
     )
