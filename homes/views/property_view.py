@@ -152,7 +152,7 @@ class PropertyFeedbackAPIView(APIView):
         responses={200: PropertyFeedBackSerializer(many=True)},
         tags=["Property feedback"],
         summary="List Property Feedback",
-        description="Returns all Property Feedback."
+        description="Returns all Property Feedbacks."
     )
     def get(self, request, *args):
         logger.info(f"Received GET request on PropertyFeedbackAPIView by user {request.user}")
@@ -176,3 +176,19 @@ class PropertyFeedbackAPIView(APIView):
         msg = f"Property creation failed: {serializers.errors}"
         logger.error(msg)
         return create_response(msg, status.HTTP_400_BAD_REQUEST)
+
+
+class PropertyOwnerFeedbackAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        responses={200: PropertyFeedBackSerializer(many=True)},
+        tags=["Property owner feedback"],
+        summary="List Property owner Feedback",
+        description="Returns all Property owner Feedbacks."
+    )
+    def get(self, request, *args):
+        logger.info(f"Received GET request on PropertyFeedbackAPIView by user {request.user}")
+        get_feedbacks = PropertyFeedBack.objects.filter(property__uploader=request.user)
+        serializers = PropertyFeedBackSerializer(get_feedbacks, many=True, context={'request': request})
+        return create_response("success", status.HTTP_200_OK, data=serializers.data, total_item=get_feedbacks.count())
