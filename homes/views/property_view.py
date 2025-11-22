@@ -170,12 +170,19 @@ class PropertyFeedbackAPIView(APIView):
     def post(self, request, *args):
         logger.info(f"Received POST request on PropertyFeedbackAPIView by user {request.user}")
         serializers = PropertyFeedBackSerializer(data=request.data, context={'request': request})
-        if serializers.is_valid():
-            serializers.save()
-            return create_response("success", status.HTTP_200_OK, data=serializers.data)
-        msg = f"Property creation failed: {serializers.errors}"
-        logger.error(msg)
-        return create_response(msg, status.HTTP_400_BAD_REQUEST)
+        property_uuid = request.data.get('property_uuid')
+        try:
+            get_property = get_property_detail(property_uuid)
+            if serializers.is_valid():
+                serializers.save(property=get_property)
+                return create_response("success", status.HTTP_200_OK, data=serializers.data)
+            msg = f"Property creation failed: {serializers.errors}"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_400_BAD_REQUEST)
+        except Property.DoesNotExist:
+            msg = f"Property with given ID not found"
+            logger.error(msg)
+            return create_response(msg, status.HTTP_404_NOT_FOUND)
 
 
 class PropertyOwnerFeedbackAPIView(APIView):
