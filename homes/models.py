@@ -86,7 +86,7 @@ class FacilityProperty(AuditModel):
 
 
 class PropertyFeedBack(AuditModel):
-    property = models.OneToOneField(Property, on_delete=models.CASCADE, related_name="property_feedback")
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_feedback")
     message = models.TextField()
 
     def __str__(self):
