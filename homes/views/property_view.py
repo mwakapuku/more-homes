@@ -175,7 +175,7 @@ class PropertyFeedbackAPIView(APIView):
     )
     def get(self, request, *args):
         logger.info(f"Received GET request on PropertyFeedbackAPIView by user {request.user}")
-        property_uuid = request.query_params.get('property_uuid')
+        property_uuid = request.query_params.get('property')
         get_feedback = PropertyFeedBack.objects.filter(property__uuid=property_uuid)
         serializers = PropertyFeedBackSerializer(get_feedback, many=True, context={'request': request})
         return create_response("success", status.HTTP_200_OK, data=serializers.data, total_item=get_feedback.count())
