@@ -20,11 +20,11 @@ def update_property_images(images_data, property_instance):
     if images_data:
         property_instance.images.all().delete()
         for img in images_data:
-            filename = img.get("filename", "image.jpg")
-            data = img.get("data")
+            data = img.get("image")
             if data:
-                image_file = ContentFile(base64.b64decode(data), name=filename)
+                image_file = create_file_from_base64(data)
                 PropertyImage.objects.create(property=property_instance, image=image_file)
+                logger.info(f"Successfully create image {image_file}")
 
 
 def create_property_images(property_instance, images_data):

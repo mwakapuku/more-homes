@@ -123,26 +123,45 @@ class PropertyUpdateAPIView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     @extend_schema(
-        responses={200: PropertySerializer(many=True)},
         tags=["properties"],
-        summary="Updater Property",
-        description="Returns all Updater Properties."
+        summary="Update Property",
+        description="Updates a specific property by UUID.",
+        responses={200: PropertySerializer},
     )
-    def put(self, request, uuid, *args):
-        logger.info(f"Received PUT request on PropertyDetailAPIView by user {request.user}")
+    def put(self, request, uuid, *args, **kwargs):
+        logger.info(f"Received PUT request by {request.user} for Property {uuid}")
+
         try:
-            get_property = get_property_detail(uuid)
-            serializer = PropertySerializer(get_property, data=request.data, context={'request': request})
+            property_obj = get_property_detail(uuid)
+            if not property_obj:
+                msg = f"Property with ID {uuid} not found"
+                logger.error(msg)
+                return create_response(msg, status.HTTP_404_NOT_FOUND)
+
+            # 🔒 Object-level permission check
+            if property_obj.uploader != request.user:
+                msg = "You do not have permission to update this property."
+                logger.warning(f"{request.user} attempted unauthorized update on property {uuid}")
+                return create_response(msg, status.HTTP_403_FORBIDDEN)
+
+            serializer = PropertySerializer(
+                property_obj,
+                data=request.data,
+                partial=True,
+                context={'request': request}
+            )
+
             if serializer.is_valid():
                 serializer.save()
                 return create_response("success", status.HTTP_200_OK, data=serializer.data)
-            msg = f"Property with ID {uuid} not found"
-            logger.error(msg)
-            return create_response(msg, status.HTTP_404_NOT_FOUND)
+
+            return create_response(serializer.errors, status.HTTP_400_BAD_REQUEST)
+
         except Exception as e:
-            msg = f"Property with ID validation failed: {e}"
+            msg = f"Property update failed: {e}"
             logger.error(msg)
             return create_response(msg, status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class PropertyFeedbackAPIView(APIView):

@@ -158,14 +158,24 @@ class PropertySerializer(serializers.ModelSerializer):
 
 class PropertyFeedBackSerializer(serializers.ModelSerializer):
     property_uuid = serializers.SerializerMethodField()
+    property_name = serializers.SerializerMethodField()
+    sender_name = serializers.SerializerMethodField()
 
     class Meta:
         model = PropertyFeedBack
-        fields = ['uuid', 'message', 'property_uuid']
+        fields = ['uuid', 'message', 'property_uuid', 'property_name', 'sender_name']
         read_only_fields = ['property_uuid']
 
     def get_property_uuid(self, obj):
-        return obj.property.uuid
+        return obj.property.uui
+
+    def get_property_name(self, obj):
+        return obj.property.name
+
+    def get_sender_name(self, obj):
+        f_name = obj.created_by.first_name if obj.created_by else None
+        l_name = obj.created_by.last_name if obj.created_by else None
+        return f"{f_name} {l_name}".title()
 
     def create(self, validated_data):
         request = self.context["request"]

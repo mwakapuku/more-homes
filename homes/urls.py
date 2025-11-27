@@ -1,10 +1,11 @@
 from django.urls import path
 
 from homes.views import PropertyAPIView, PropertyDetailAPIView, PropertyOwnerAPIView, PropertyFeedbackAPIView, \
-    PropertyOwnerFeedbackAPIView
+    PropertyOwnerFeedbackAPIView, PropertyUpdateAPIView
 
 urlpatterns = [
     path('properties/', PropertyAPIView.as_view(), name='properties'),
+    path('update-property/', PropertyUpdateAPIView.as_view(), name='update-property'),
     path('property/<uuid>', PropertyDetailAPIView.as_view(), name='property_detail'),
     path('uploader-properties/', PropertyOwnerAPIView.as_view(), name='property_detail'),
     path('property-feedbacks/', PropertyFeedbackAPIView.as_view(), name='property_feedbacks'),
