@@ -167,7 +167,7 @@ class PropertyFeedBackSerializer(serializers.ModelSerializer):
         read_only_fields = ['property_uuid']
 
     def get_property_uuid(self, obj):
-        return obj.property.uui
+        return obj.property.uuid
 
     def get_property_name(self, obj):
         return obj.property.name
