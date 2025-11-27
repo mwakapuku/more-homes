@@ -381,6 +381,19 @@ class ChangeUserPasswordApiView(APIView):
         return create_response(msg, status.HTTP_200_OK)
 
 
+class PropertyUpdateAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    @extend_schema(
+        tags=["properties"],
+        summary="Update Property",
+        description="Updates a specific property by UUID.",
+        responses={200: UserProfileSerializer},
+    )
+    def put(self, request, uuid, *args, **kwargs):
+        logger.info(f"Received PUT request by {request.user} for profile {uuid}")
+
+
 class GroupApiView(APIView):
     def get(self, request, *args, **kwargs):
         groups = Group.objects.exclude(name__icontains="admin")
