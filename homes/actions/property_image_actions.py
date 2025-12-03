@@ -18,7 +18,7 @@ def update_property_images(images_data, property_instance):
                       Example: [{"filename": "image1.jpg", "data": "...base64..."}]
      """
     if images_data:
-        property_instance.images.all().delete()
+        property_instance.property_images.all().delete()
         for img in images_data:
             data = img.get("image")
             if data:
