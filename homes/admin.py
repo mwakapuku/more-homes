@@ -2,6 +2,9 @@ from django.contrib import admin
 
 from homes.models import Property, PropertyImage, FacilityProperty, Facility, PropertyFeedBack
 
+admin.site.site_header = "More Homes"
+admin.site.site_title = "More Homes"
+admin.site.index_title = "More Homes"
 
 @admin.register(Property)
 class PropertyAdmin(admin.ModelAdmin):

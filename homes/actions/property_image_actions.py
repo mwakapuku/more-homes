@@ -1,7 +1,3 @@
-import base64
-
-from django.core.files.base import ContentFile
-
 from homes.models import PropertyImage
 from utils.function import create_file_from_base64
 from utils.logger import AppLogger
