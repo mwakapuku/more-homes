@@ -1,10 +1,8 @@
 import base64
-
 import nextsms
 import uuid
-
+import json
 from django.core.files.base import ContentFile
-
 from payment.models import CustomerOrder, OrderStaticConfig
 from utils.logger import AppLogger
 
@@ -83,4 +81,13 @@ def create_file_from_base64(base64_str, ext="jpg"):
 
     except Exception as e:
         logger.error(f"Failed to decode Base64 file: {e}")
+        return None
+
+
+def check_json_list_type(value):
+    if isinstance(value, list):
+        return value
+    if isinstance(value, str):
+        return json.loads(value)
+    else:
         return None

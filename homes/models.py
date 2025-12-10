@@ -85,9 +85,29 @@ class FacilityProperty(AuditModel):
         ordering = ['-created_at']
 
 
+class PropertyCost(AuditModel):
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='property_costs')
+    name = models.CharField("Cost", max_length=200)
+    amount = models.DecimalField('Amount', max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"{self.name}"
+
+    class Meta:
+        db_table = 'property_cost'
+        verbose_name_plural = "Property Costs"
+        verbose_name = "Property Costs"
+        ordering = ['-created_at']
+
 class PropertyFeedBack(AuditModel):
     property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name="property_feedback")
     message = models.TextField()
 
     def __str__(self):
         return f"{self.property.name}"
+
+    class Meta:
+        db_table = 'property_feedback'
+        verbose_name_plural = "Property Feedback"
+        verbose_name = "Property Feedback"
+        ordering = ['-created_at']

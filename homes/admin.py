@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from homes.models import Property, PropertyImage, FacilityProperty, Facility, PropertyFeedBack
+from homes.models import Property, PropertyImage, FacilityProperty, Facility, PropertyFeedBack, PropertyCost
 
 admin.site.site_header = "More Homes"
 admin.site.site_title = "More Homes"
@@ -42,5 +42,11 @@ class PropertyFeedBackAdmin(admin.ModelAdmin):
 @admin.register(FacilityProperty)
 class FacilityPropertyAdmin(admin.ModelAdmin):
     list_display = ['property', 'name', 'created_at', 'updated_at']
+    list_filter = ['created_at', 'updated_at']
+    list_per_page = 30
+
+@admin.register(PropertyCost)
+class FacilityPropertyAdmin(admin.ModelAdmin):
+    list_display = ['property', 'name', 'amount', 'created_at', 'updated_at']
     list_filter = ['created_at', 'updated_at']
     list_per_page = 30

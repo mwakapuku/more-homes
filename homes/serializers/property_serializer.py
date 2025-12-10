@@ -1,11 +1,14 @@
 import json
 
 from decouple import config
+from django.db.models import Sum
 from rest_framework import serializers
 
-from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities
+from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities, \
+    create_project_cost
 from homes.actions.property_image_actions import update_property_images, create_property_images
-from homes.models import PropertyImage, FacilityProperty, Property, Facility, PropertyFeedBack
+from homes.models import PropertyImage, FacilityProperty, Property, Facility, PropertyFeedBack, PropertyCost
+from utils.function import check_json_list_type
 
 base_url = config('BASE_URL')
 
@@ -14,6 +17,12 @@ class FacilitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Facility
         fields = '__all__'
+
+
+class PropertyCostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PropertyCost
+        fields = ['name', 'amount']
 
 
 class PropertyFacilitySerializer(serializers.ModelSerializer):
@@ -40,6 +49,7 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 class PropertySerializer(serializers.ModelSerializer):
     uploader = serializers.ReadOnlyField(source="uploader.id")
     facilities = PropertyFacilitySerializer(many=True, read_only=True)
+    property_costs = PropertyCostSerializer(many=True, read_only=True)
     property_images = PropertyImageSerializer(many=True, read_only=True)
     thumbnail = serializers.SerializerMethodField()
 
@@ -54,11 +64,16 @@ class PropertySerializer(serializers.ModelSerializer):
             'uuid', "name", "type", "address", "price", "thumbnail", "is_booked", "description", "total_price",
             "latitude", "longitude", "region", "district", "maintenance", "category", "uploader", "uploader_name",
             "uploader_phone", "uploader_role", "uploader_image_url", "created_at", "property_images", "facilities",
+            "property_costs"
         ]
 
     def get_uploader_name(self, obj):
         """Return the full name of the uploader, or None if uploader is missing."""
         return f"{obj.uploader.first_name} {obj.uploader.last_name}" if obj.uploader else None
+    def get_total_amount(self, obj):
+        """Return the total amount of the property other cost."""
+        return obj.property_costs.aggregate(total=Sum("amount"))["total"]
+
 
     def get_uploader_phone(self, obj):
         """Return the phone number of the uploader, or None if not available."""
@@ -99,25 +114,23 @@ class PropertySerializer(serializers.ModelSerializer):
         property_instance = Property.objects.create(**validated_data)
 
         # --- Parse facilities ---
-        facilities_data = []
         raw_facilities = request.data.get("facilities", [])
-        try:
-            if isinstance(raw_facilities, str):
-                # If frontend sent a JSON string
-                facilities_data = json.loads(raw_facilities)
-            elif isinstance(raw_facilities, list):
-                # If frontend sent an array directly (correct case)
-                facilities_data = raw_facilities
-            else:
-                print("Facilities received in unsupported format")
+        raw_project_cost = request.data.get("project_cost", [])
 
-            print("Facilities parsed successfully")
-            print(facilities_data)
+        try:
+            facilities_data = check_json_list_type(raw_facilities)
+            project_cost = check_json_list_type(raw_project_cost)
+
+            if facilities_data is not None:
+                create_property_facilities(facilities_data, property_instance)
+            print("Facilities received in unsupported format")
+
+            if project_cost is not None:
+                create_project_cost(project_cost, property_instance)
+            print("project cost received in unsupported format")
 
         except Exception as e:
             print(f"Error parsing facilities: {e}")
-
-        create_property_facilities(facilities_data, property_instance)
 
         # --- Parse Base64 Images ---
         images_data = request.data.get("images", [])
@@ -130,22 +143,19 @@ class PropertySerializer(serializers.ModelSerializer):
     # --- UPDATE with Base64 images ---
     def update(self, instance, validated_data):
         request = self.context["request"]
-
-        # --- Parse facilities ---
-        facilities_data = []
-        raw_facilities = request.data.get("facilities", "[]")
-        try:
-            facilities_data = json.loads(raw_facilities)
-        except Exception:
-            pass
-
         # --- Update property fields ---
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # --- Update facilities ---
-        update_property_facilities(facilities_data, instance)
+        # --- Parse facilities  ---
+        raw_facilities = request.data.get("facilities", [])
+        try:
+            # --- Update facilities ---
+            facilities_data = json.loads(raw_facilities)
+            update_property_facilities(facilities_data, instance)
+        except Exception:
+            pass
 
         # --- Parse Base64 Images ---
         images_data = request.data.get("images", [])

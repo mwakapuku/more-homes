@@ -1,4 +1,18 @@
-from homes.models import FacilityProperty
+from homes.models import FacilityProperty, PropertyCost
+
+
+def create_project_cost(project_costs, property_instance):
+    if project_costs:
+        for project_cost in project_costs:
+            name = project_cost.get("name")
+            amount = project_cost.get("amount")
+            PropertyCost.objects.create(
+                property=property_instance,
+                name=name,
+                amount=amount,
+                created_by=property_instance.created_by,
+                updated_by=property_instance.created_by,
+            )
 
 
 def create_property_facilities(facilities, property_instance):
