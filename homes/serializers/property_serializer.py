@@ -54,6 +54,7 @@ class PropertySerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
 
     uploader_name = serializers.SerializerMethodField()
+    total_cost = serializers.SerializerMethodField()
     uploader_phone = serializers.SerializerMethodField()
     uploader_role = serializers.SerializerMethodField()
     uploader_image_url = serializers.SerializerMethodField()
@@ -64,16 +65,17 @@ class PropertySerializer(serializers.ModelSerializer):
             'uuid', "name", "type", "address", "price", "thumbnail", "is_booked", "description", "total_price",
             "latitude", "longitude", "region", "district", "maintenance", "category", "uploader", "uploader_name",
             "uploader_phone", "uploader_role", "uploader_image_url", "created_at", "property_images", "facilities",
-            "property_costs"
+            "property_costs", "total_cost"
         ]
 
     def get_uploader_name(self, obj):
         """Return the full name of the uploader, or None if uploader is missing."""
         return f"{obj.uploader.first_name} {obj.uploader.last_name}" if obj.uploader else None
-    def get_total_amount(self, obj):
-        """Return the total amount of the property other cost."""
-        return obj.property_costs.aggregate(total=Sum("amount"))["total"]
 
+    def get_total_cost(self, obj):
+        """Return the total amount of the property other cost."""
+        total_cost = obj.price + obj.property_costs.aggregate(total=Sum("amount"))["total"]
+        return total_cost
 
     def get_uploader_phone(self, obj):
         """Return the phone number of the uploader, or None if not available."""
