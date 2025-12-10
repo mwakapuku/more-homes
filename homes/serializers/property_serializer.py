@@ -1,7 +1,8 @@
 import json
 
 from decouple import config
-from django.db.models import Sum
+from django.db.models import Sum, Value
+from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
 from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities, \
@@ -74,8 +75,10 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def get_total_cost(self, obj):
         """Return the total amount of the property other cost."""
-        total_cost = obj.price + obj.property_costs.aggregate(total=Sum("amount"))["total"]
-        return total_cost
+        total_other_costs = obj.property_costs.aggregate(
+            total=Coalesce(Sum("amount"), Value(0))
+        )["total"]
+        return obj.price + total_other_costs
 
     def get_uploader_phone(self, obj):
         """Return the phone number of the uploader, or None if not available."""
