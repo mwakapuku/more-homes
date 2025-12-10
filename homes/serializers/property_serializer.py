@@ -1,7 +1,7 @@
 import json
 
 from decouple import config
-from django.db.models import Sum, Value
+from django.db.models import Sum, Value, DecimalField
 from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
@@ -76,8 +76,13 @@ class PropertySerializer(serializers.ModelSerializer):
     def get_total_cost(self, obj):
         """Return the total amount of the property other cost."""
         total_other_costs = obj.property_costs.aggregate(
-            total=Coalesce(Sum("amount"), Value(0))
+            total=Coalesce(
+                Sum("amount"),
+                Value(0),
+                output_field=DecimalField(max_digits=12, decimal_places=2)
+            )
         )["total"]
+
         return obj.price + total_other_costs
 
     def get_uploader_phone(self, obj):
