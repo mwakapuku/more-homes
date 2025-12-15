@@ -125,7 +125,7 @@ class PropertySerializer(serializers.ModelSerializer):
 
         # --- Parse facilities ---
         raw_facilities = request.data.get("facilities", [])
-        raw_project_cost = request.data.get("project_cost", [])
+        raw_project_cost = request.data.get("project_costs", [])
 
         try:
             facilities_data = check_json_list_type(raw_facilities)
