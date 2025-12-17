@@ -6,7 +6,7 @@ from django.db.models.functions import Coalesce
 from rest_framework import serializers
 
 from homes.actions.property_facility_actions import update_property_facilities, create_property_facilities, \
-    create_project_cost
+    create_property_cost
 from homes.actions.property_image_actions import update_property_images, create_property_images
 from homes.models import PropertyImage, FacilityProperty, Property, Facility, PropertyFeedBack, PropertyCost
 from utils.function import check_json_list_type
@@ -124,19 +124,25 @@ class PropertySerializer(serializers.ModelSerializer):
         property_instance = Property.objects.create(**validated_data)
 
         # --- Parse facilities ---
-        raw_facilities = request.data.get("facilities", [])
-        raw_project_cost = request.data.get("project_costs", [])
+        raw_facilities = request.data.get("facilities")
+        raw_property_cost = request.data.get("property_costs")
+
+        print("Facilites")
+        print(raw_facilities)
+
+        print("Project Costs")
+        print(raw_property_cost)
 
         try:
             facilities_data = check_json_list_type(raw_facilities)
-            project_cost = check_json_list_type(raw_project_cost)
+            property_cost = check_json_list_type(raw_property_cost)
 
             if facilities_data is not None:
                 create_property_facilities(facilities_data, property_instance)
             print("Facilities received in unsupported format")
 
-            if project_cost is not None:
-                create_project_cost(project_cost, property_instance)
+            if property_cost is not None:
+                create_property_cost(property_cost, property_instance)
             print("project cost received in unsupported format")
 
         except Exception as e:
