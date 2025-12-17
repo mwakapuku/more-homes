@@ -127,23 +127,23 @@ class PropertySerializer(serializers.ModelSerializer):
         raw_facilities = request.data.get("facilities")
         raw_property_cost = request.data.get("property_costs")
 
-        print("Facilites")
-        print(raw_facilities)
-
-        print("Project Costs")
-        print(raw_property_cost)
-
         try:
             facilities_data = check_json_list_type(raw_facilities)
             property_cost = check_json_list_type(raw_property_cost)
 
             if facilities_data is not None:
+                print("Facilities on saving")
+                print(facilities_data)
                 create_property_facilities(facilities_data, property_instance)
-            print("Facilities received in unsupported format")
+            else:
+                print("Facilities received in unsupported format")
 
             if property_cost is not None:
+                print("Project costs on saving")
+                print(property_cost)
                 create_property_cost(property_cost, property_instance)
-            print("project cost received in unsupported format")
+            else:
+                print("Project cost received in unsupported format")
 
         except Exception as e:
             print(f"Error parsing facilities: {e}")
